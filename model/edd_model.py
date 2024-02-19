@@ -1,11 +1,8 @@
 import torch
-from torch import nn
 # from AE.ae_model import Encoder
 import torch.nn.functional as F
-
-from TranAD.dlutils import TransformerEncoderLayer
 from modules import ConvLayer, FeatureAttentionLayer, TemporalAttentionLayer, GRULayer
-from my_model import PositionalEncoding
+from torch import nn
 
 
 class VAE_MODEL(nn.Module):

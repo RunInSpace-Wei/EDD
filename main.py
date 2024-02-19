@@ -9,18 +9,14 @@ from torch.optim import lr_scheduler
 from torch.optim.lr_scheduler import StepLR, LambdaLR
 
 from GDN_models.GDN import GDN
-from customer_model import MTAD_Transform
 from eval_methods import *
-from AE.ae_model import ED
 
 from args import get_parser
 from utils import *
-from my_model import MTAD_MODEL, MTAD_MODEL2, MTAD_MODEL3, MTAD_MODEL4
 from TranAD.models import TranAD
-from VAE.vae_model import VAE_MODEL
+from model.edd_model import VAE_MODEL
 import torch.nn.functional as F
 
-import matplotlib.pyplot as plt
 
 
 def vae_loss(x, mu_pos, log_var_pos, x_pos_rec, x_disc_pos, x_disc_neg, mu_neg=None, log_var_neg=None):
