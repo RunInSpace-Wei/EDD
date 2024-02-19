@@ -1,22 +1,15 @@
-import math
 import time
 from datetime import datetime
-import time
-import numpy as np
-import torch
+
 import torch.nn as nn
-from torch.optim import lr_scheduler
-from torch.optim.lr_scheduler import StepLR, LambdaLR
-
-from GDN_models.GDN import GDN
-from eval_methods import *
-
-from args import get_parser
-from utils import *
-from TranAD.models import TranAD
-from model.edd_model import VAE_MODEL
 import torch.nn.functional as F
 
+from GDN_models.GDN import GDN
+from TranAD.models import TranAD
+from args import get_parser
+from eval_methods import *
+from model.edd_model import VAE_MODEL
+from utils import *
 
 
 def vae_loss(x, mu_pos, log_var_pos, x_pos_rec, x_disc_pos, x_disc_neg, mu_neg=None, log_var_neg=None):
@@ -132,9 +125,9 @@ if __name__ == "__main__":
     args.__setattr__("lookback", 20)
     args.__setattr__("epochs", 50)
     # args.__setattr__("group", "2-1")
-    model_name = ''
+    # model_name = ''
     # model_name = "TranAD"
-    model_name = "VAE_MODEL"
+    model_name = "EDD"
     # model_name = "GDN"
 
     dataset = args.dataset
@@ -237,8 +230,7 @@ if __name__ == "__main__":
 
             print(
                 f"[Epoch {epoch + 1}] loss = {avg_loss:.5f} [{epoch_time:.1f}s]")
-    elif model_name == "VAE_MODEL":
-        # model = MTAD_Transform(n_features, window_size, out_dim).cuda()
+    elif model_name == "EDD":
         model = VAE_MODEL(n_features, window_size, out_dim).cuda()
 
         optimizer = torch.optim.Adam(model.parameters(), lr=args.init_lr)
@@ -321,45 +313,6 @@ if __name__ == "__main__":
     #     plt.plot(np.array(loss_arr), 'b', label='loss')
     #     plt.savefig(f"figure/{model.__class__.__name__}_{dataset}.jpg")
 
-    else:
-        model = MTAD_MODEL4(n_features, window_size, out_dim).cuda()
-
-        optimizer = torch.optim.Adam(model.parameters(), lr=args.init_lr)
-        scheduler = LambdaLR(optimizer, lr_lambda=lambda epoch: 1 / (epoch + 1))
-        # scheduler = StepLR(optimizer, step_size=3, gamma=0.2)
-        loss_func = nn.MSELoss(reduction='mean')
-        loss_arr = []
-        for epoch in range(n_epochs):
-            epoch_start = time.time()
-            model.train()
-            b_loss = []
-            n = epoch + 1
-            for x, y in train_loader:
-                x = x.cuda()
-                y = y.cuda()
-                optimizer.zero_grad()
-                output = model(x)
-                if target_dims is not None:
-                    # y = y[:, :, target_dims]
-                    x = x[:, :, target_dims]
-                #     output = output.squeeze(-1)
-                # loss = (1 - n / n_epochs) * loss_func(output[0], x) + (n / n_epochs) * loss_func(output[1], y)
-                # loss = (1 / n) * loss_func(output[0], x) + (1 - 1 / n) * loss_func(output[1], y)
-                loss = loss_func(output[0], x) + loss_func(output[1], y)
-                # loss = loss_func(output, y)
-                # loss_a = vae_loss(x, *output)
-                b_loss.append(loss.item())
-                loss.backward()
-                optimizer.step()
-            scheduler.step()
-
-            b_loss = np.array(b_loss)
-            avg_loss = b_loss.mean()
-            loss_arr.append(avg_loss)
-            epoch_time = time.time() - epoch_start
-
-            print(
-                f"[Epoch {epoch + 1}] loss = {avg_loss:.5f} [{epoch_time:.1f}s]")
     print(f"train time: {time.time() - train_start}")
     test_loss = evaluator(test_loader)
     # train_loss = evaluator(train_loader)
