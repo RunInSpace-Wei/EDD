@@ -116,22 +116,6 @@ def calc_point2point(predict, actual):
     f1 = 2 * precision * recall / (precision + recall + 0.00001)
     return f1, precision, recall, TP, TN, FP, FN
 
-def calc_point2point2(predict, actual):
-    """
-    calculate f1 score by predict and actual.
-    Args:
-            predict (np.ndarray): the predict label
-            actual (np.ndarray): np.ndarray
-    Method from OmniAnomaly (https://github.com/NetManAIOps/OmniAnomaly)
-    """
-    TP = np.sum(predict * actual)  # 正确预警
-    TN = np.sum((1 - predict) * (1 - actual))  # 正确未预警
-    FP = np.sum(predict * (1 - actual))  # 误报
-    FN = np.sum((1 - predict) * actual)  # 漏报
-    precision = TP / (TP + FP + 0.00001)
-    recall = TP / (TP + FN + 0.00001)
-    f1 = 2 * precision * recall / (precision + recall + 0.00001)
-    return f1, precision, recall, TP, TN, FP, FN
 
 
 def pot_eval(init_score, score, label, q=1e-3, level=0.99, dynamic=False):
@@ -180,7 +164,7 @@ def pot_eval(init_score, score, label, q=1e-3, level=0.99, dynamic=False):
 
 def bf_search(score, label, start, end=None, step_num=1, display_freq=1, verbose=True):
     """
-    Find the best-f1 score by searching best `threshold` in [`start`, `end`).
+    Find the best-f1 score by searching best `threshold` in [`start`, `end`) with soft identification approach.
     Method from OmniAnomaly (https://github.com/NetManAIOps/OmniAnomaly)
     """
 
@@ -220,7 +204,7 @@ def bf_search(score, label, start, end=None, step_num=1, display_freq=1, verbose
 
 def bf_search1(score, label, start, end=None, step_num=1, display_freq=1, verbose=True):
     """
-    Find the best-f1 score by searching best `threshold` in [`start`, `end`).
+    Find the best-f1 score by searching best `threshold` in [`start`, `end`) with hard identification approach.
     Method from OmniAnomaly (https://github.com/NetManAIOps/OmniAnomaly)
     """
 
@@ -257,11 +241,12 @@ def bf_search1(score, label, start, end=None, step_num=1, display_freq=1, verbos
         "latency": m_l,
     }
 
+# hard identification approach
 def calc_seq1(score, label, threshold):
     predict = score > threshold
     return calc_point2point(predict, label), 0
 
-
+# soft identification approach
 def calc_seq(score, label, threshold):
     predict, latency = adjust_predicts(score, label, threshold, calc_latency=True)
     return calc_point2point(predict, label), latency

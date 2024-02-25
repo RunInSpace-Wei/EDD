@@ -21,36 +21,7 @@ def load_and_save(category, filename, dataset, dataset_folder, output_folder):
 def load_data(dataset):
     """ Method from OmniAnomaly (https://github.com/NetManAIOps/OmniAnomaly) """
 
-    if dataset == "SMD":
-        dataset_folder = "datasets/ServerMachineDataset"
-        output_folder = "datasets/ServerMachineDataset/processed"
-        makedirs(output_folder, exist_ok=True)
-        file_list = listdir(path.join(dataset_folder, "train"))
-        for filename in file_list:
-            if filename.endswith(".txt"):
-                load_and_save(
-                    "train",
-                    filename,
-                    filename.strip(".txt"),
-                    dataset_folder,
-                    output_folder,
-                )
-                load_and_save(
-                    "test_label",
-                    filename,
-                    filename.strip(".txt"),
-                    dataset_folder,
-                    output_folder,
-                )
-                load_and_save(
-                    "test",
-                    filename,
-                    filename.strip(".txt"),
-                    dataset_folder,
-                    output_folder,
-                )
-
-    elif dataset == "SMAP" or dataset == "MSL":
+    if dataset == "SMAP" or dataset == "MSL":
         dataset_folder = "datasets/data"
         output_folder = "datasets/data/processed"
         makedirs(output_folder, exist_ok=True)
@@ -94,35 +65,6 @@ def load_data(dataset):
         makedirs(output_folder, exist_ok=True)
         train = pd.read_csv(path.join(dataset_folder, 'train_data.csv'), index_col='time')
         test = pd.read_csv(path.join(dataset_folder, 'test_data_with_label.csv'), index_col='time')
-        test_label = test['label']
-        test.drop('label', axis=1, inplace=True)
-        train, test, test_label = train.values.astype(float), test.values.astype(float), test_label.values.astype(int).reshape(-1, 1)
-        for filename in ['train', 'test', 'test_label']:
-            print(dataset, dataset + '_' + filename, eval(filename).shape)
-            with open(path.join(output_folder, dataset + "_" + filename + ".pkl"), "wb") as file:
-                dump(eval(filename), file)
-
-    elif dataset.startswith("SWaT"):
-        dataset_folder = f"datasets/{dataset}"
-        output_folder = f"datasets/{dataset}/processed"
-        makedirs(output_folder, exist_ok=True)
-        train = pd.read_csv(path.join(dataset_folder, 'SWaT_train.csv'))
-        test = pd.read_csv(path.join(dataset_folder, 'SWaT_test.csv'))
-        test_label = test['label']
-        test.drop('label', axis=1, inplace=True)
-        train, test, test_label = train.values.astype(float), test.values.astype(float), test_label.values.astype(int).reshape(-1, 1)
-        for filename in ['train', 'test', 'test_label']:
-            print(dataset, dataset + '_' + filename, eval(filename).shape)
-            with open(path.join(output_folder, dataset + "_" + filename + ".pkl"), "wb") as file:
-                dump(eval(filename), file)
-
-    elif dataset.startswith("WADI"):
-        dataset_folder = f"datasets/{dataset}"
-        output_folder = f"datasets/{dataset}/processed"
-        makedirs(output_folder, exist_ok=True)
-        train = pd.read_csv(path.join(dataset_folder, 'WADI_train.csv'))
-        test = pd.read_csv(path.join(dataset_folder, 'WADI_test.csv'))
-        # train = train.head(len(train) // 5)
         test_label = test['label']
         test.drop('label', axis=1, inplace=True)
         train, test, test_label = train.values.astype(float), test.values.astype(float), test_label.values.astype(int).reshape(-1, 1)

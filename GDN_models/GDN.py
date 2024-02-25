@@ -2,7 +2,7 @@ import math
 import torch.nn as nn
 import torch.nn.functional as F
 
-from GDN_models.util.env import *
+from .util.env import *
 from .graph_layer import GraphLayer
 
 
